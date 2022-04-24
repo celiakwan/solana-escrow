@@ -10,7 +10,7 @@ pub enum EscrowError {
     #[error("Expected Amount Mismatch")]
     ExpectedAmountMismatch,
     #[error("Amount Overflow")]
-    AmountOverflow
+    AmountOverflow,
 }
 
 impl From<EscrowError> for ProgramError {

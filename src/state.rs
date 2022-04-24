@@ -1,7 +1,7 @@
-use arrayref::{ array_mut_ref, array_ref, array_refs, mut_array_refs };
+use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
 use solana_program::{
     program_error::ProgramError,
-    program_pack::{ IsInitialized, Pack, Sealed },
+    program_pack::{IsInitialized, Pack, Sealed},
     pubkey::Pubkey,
 };
 
@@ -10,7 +10,7 @@ pub struct Escrow {
     pub initializer: Pubkey,
     pub temp_token_account: Pubkey,
     pub initializer_wanted_token_account: Pubkey,
-    pub amount: u64
+    pub amount: u64,
 }
 
 impl Sealed for Escrow {}
@@ -31,19 +31,21 @@ impl Pack for Escrow {
             initializer,
             temp_token_account,
             initializer_wanted_token_account,
-            amount
+            amount,
         ) = array_refs![data, 1, 32, 32, 32, 8];
-        
+
         Ok(Escrow {
             is_initialized: match is_initialized {
                 [0] => false,
                 [1] => true,
-                _ => return Err(ProgramError::InvalidAccountData)
+                _ => return Err(ProgramError::InvalidAccountData),
             },
             initializer: Pubkey::new_from_array(*initializer),
             temp_token_account: Pubkey::new_from_array(*temp_token_account),
-            initializer_wanted_token_account: Pubkey::new_from_array(*initializer_wanted_token_account),
-            amount: u64::from_le_bytes(*amount)
+            initializer_wanted_token_account: Pubkey::new_from_array(
+                *initializer_wanted_token_account,
+            ),
+            amount: u64::from_le_bytes(*amount),
         })
     }
 
@@ -54,13 +56,14 @@ impl Pack for Escrow {
             initializer,
             temp_token_account,
             initializer_wanted_token_account,
-            amount
+            amount,
         ) = mut_array_refs![data, 1, 32, 32, 32, 8];
 
         *is_initialized = [*&self.is_initialized as u8];
         initializer.copy_from_slice(&self.initializer.as_ref());
         temp_token_account.copy_from_slice(&self.temp_token_account.as_ref());
-        initializer_wanted_token_account.copy_from_slice(&self.initializer_wanted_token_account.as_ref());
+        initializer_wanted_token_account
+            .copy_from_slice(&self.initializer_wanted_token_account.as_ref());
         *amount = *&self.amount.to_le_bytes();
     }
 }
